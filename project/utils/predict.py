@@ -11,6 +11,7 @@ Falls back to demo mode if model or class map are missing.
 import os
 import random
 import numpy as np
+import gc
 
 from utils.preprocess import preprocess_image
 
@@ -96,7 +97,8 @@ def load_model_once():
     try:
         import tensorflow as tf
         print(f"[INFO] Loading model from {MODEL_PATH} ...")
-        _model = tf.keras.models.load_model(MODEL_PATH)
+        # Optimization: load with compile=False to save memory/time
+        _model = tf.keras.models.load_model(MODEL_PATH, compile=False)
         _load_class_list()
         print("[INFO] Model ready.")
         return _model
@@ -140,7 +142,11 @@ def predict_disease(image_path: str) -> dict:
 
     try:
         img_tensor  = preprocess_image(image_path)           # (1,224,224,3)
-        predictions = model.predict(img_tensor, verbose=0)   # (1, num_classes)
+        
+        # Optimization: Use __call__ instead of predict() for lower memory overhead
+        predictions = model(img_tensor, training=False)
+        predictions = predictions.numpy() if hasattr(predictions, 'numpy') else predictions
+        
         pred_index  = int(np.argmax(predictions[0]))
         confidence  = float(np.max(predictions[0])) * 100
 
@@ -154,6 +160,9 @@ def predict_disease(image_path: str) -> dict:
 
         class_name = _class_list[pred_index]
 
+        # Manual cleanup to help Render's OOM issues
+        gc.collect()
+
         return {
             "class_name"  : class_name,
             "display_name": _get_display(class_name),
@@ -164,6 +173,7 @@ def predict_disease(image_path: str) -> dict:
 
     except Exception as exc:
         print(f"[ERROR] Prediction failed: {exc}")
+        gc.collect()
         result = _demo_prediction()
         result["error"] = str(exc)
         return result
