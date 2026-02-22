@@ -12,7 +12,10 @@ Werkzeug>=3.1.0
 # Install separately — large package (~500 MB):
 #   pip install tensorflow          (GPU support)
 #   pip install tensorflow-cpu      (CPU only, smaller)
-# tensorflow>=2.15.0
+tensorflow-cpu>=2.15.0
+
+# ── Production Server ────────────────────────────────────────
+gunicorn>=21.2.0
 
 # ── Image Processing ─────────────────────────────────────────
 opencv-python-headless>=4.9.0
