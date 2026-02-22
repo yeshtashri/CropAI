@@ -1,7 +1,7 @@
 # ============================================================
 #  AI Crop Disease Prediction System — Requirements
 #  Install: pip install -r requirements.txt
-#  Tested with Python 3.13
+#  Tested with Python 3.11
 # ============================================================
 
 # ── Web Framework ────────────────────────────────────────────
