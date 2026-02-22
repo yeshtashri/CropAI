@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CropAI — About</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <span class="brand-icon">🌿</span> CropAI
+            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-green btn-sm">
+                    <i class="bi bi-house me-1"></i>Home
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <section class="py-5">
+        <div class="container" style="max-width:860px">
+
+            <div class="text-center mb-5 fade-in-up">
+                <h1 class="section-title">About CropAI</h1>
+                <p class="text-muted">AI-Driven Crop Disease Prediction and Management System</p>
+            </div>
+
+            <!-- Tech Stack -->
+            <div class="glass-card p-4 mb-4 fade-in-up">
+                <h5 class="fw-700 mb-3"><i class="bi bi-stack text-green me-2"></i>Technology Stack</h5>
+                <div class="row g-3">
+                    {% set stack = [
+                    ('Python 3.x', 'bi-filetype-py', 'Programming Language'),
+                    ('Flask', 'bi-server', 'Web Framework'),
+                    ('TensorFlow / Keras', 'bi-cpu', 'AI Framework'),
+                    ('MobileNetV2 CNN', 'bi-diagram-3', 'Deep Learning Model'),
+                    ('OpenCV', 'bi-camera', 'Image Processing'),
+                    ('Bootstrap 5', 'bi-bootstrap', 'Frontend UI'),
+                    ('NumPy / Pandas', 'bi-table', 'Data Handling'),
+                    ('PlantVillage', 'bi-database', 'Training Dataset'),
+                    ] %}
+                    {% for name, icon, desc in stack %}
+                    <div class="col-sm-6 col-md-3">
+                        <div class="result-section text-center py-3">
+                            <i class="bi {{ icon }} fs-4 text-green d-block mb-1"></i>
+                            <div class="fw-600" style="font-size:.88rem">{{ name }}</div>
+                            <div class="text-muted" style="font-size:.77rem">{{ desc }}</div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- How it works -->
+            <div class="glass-card p-4 mb-4 fade-in-up delay-1">
+                <h5 class="fw-700 mb-4"><i class="bi bi-diagram-3 text-green me-2"></i>How It Works</h5>
+                {% set steps = [
+                ('1', 'bi-upload', 'Upload Image', 'User uploads a JPG/PNG photo of a crop leaf via drag-and-drop or
+                file browser.'),
+                ('2', 'bi-image', 'Preprocessing', 'Image is resized to 224×224 pixels, converted to RGB, and normalised
+                to [0,1] range using OpenCV.'),
+                ('3', 'bi-cpu', 'AI Inference', 'MobileNetV2 CNN processes the image tensor and outputs class
+                probabilities for 16 disease categories.'),
+                ('4', 'bi-check2-circle', 'Results', 'The top predicted class with confidence score is displayed along
+                with detailed treatment recommendations.'),
+                ] %}
+                {% for num, icon, title, desc in steps %}
+                <div class="step-item">
+                    <span class="step-num">{{ num }}</span>
+                    <div>
+                        <div class="fw-600 mb-1"><i class="bi {{ icon }} me-1 text-green"></i>{{ title }}</div>
+                        <div class="text-muted" style="font-size:.88rem">{{ desc }}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Dataset info -->
+            <div class="glass-card p-4 mb-4 fade-in-up delay-2">
+                <h5 class="fw-700 mb-3"><i class="bi bi-database text-green me-2"></i>Dataset Information</h5>
+                <p class="text-muted" style="font-size:.92rem">
+                    This system is trained on the <strong style="color:var(--text-main)">PlantVillage Dataset</strong>,
+                    a benchmark dataset containing 54,000+ images of healthy and diseased plant leaves across 38+
+                    classes.
+                    The local subset used here includes <strong style="color:var(--text-main)">16 classes</strong>
+                    covering Bell Pepper, Potato, and Tomato plants.
+                </p>
+                <div class="row g-2 mt-2">
+                    {% for crop, classes, color in [('Bell Pepper', 2, 'green'), ('Potato', 3, 'blue'), ('Tomato', 11,
+                    'orange')] %}
+                    <div class="col-auto">
+                        <span class="pesticide-chip">{{ crop }}: {{ classes }} classes</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Run instructions -->
+            <div class="glass-card p-4 fade-in-up delay-3">
+                <h5 class="fw-700 mb-3"><i class="bi bi-terminal text-green me-2"></i>How to Run Locally</h5>
+                <div class="result-section">
+                    <pre style="color:var(--primary-light);font-size:.85rem;margin:0;overflow-x:auto"><code># 1. Install dependencies
+pip install -r requirements.txt
+
+# 2. Train the AI model (takes 20-40 min on CPU)
+cd project
+python model/train_model.py
+
+# 3. Run the Flask app
+python app.py
+
+# 4. Open in browser
+# http://127.0.0.1:5000</code></pre>
+                </div>
+                <p class="text-muted mt-3 mb-0" style="font-size:.85rem">
+                    <i class="bi bi-info-circle me-1"></i>
+                    <strong style="color:var(--text-main)">Demo Mode:</strong>
+                    If <code>plant_disease_model.h5</code> is not found, the system runs in demo mode
+                    and returns simulated predictions so you can test the UI without training.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p class="mb-0">🌿 <strong>CropAI</strong> — AI Crop Disease Prediction System &nbsp;|&nbsp; B.Tech Final
+                Year Project &copy; 2024</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+
+</html>
