@@ -15,6 +15,7 @@ Run:
 """
 
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Suppress TF logging to save memory/noise
 import sys
 import uuid
 import json
