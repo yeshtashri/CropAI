@@ -12,8 +12,8 @@ import os
 import random
 import numpy as np
 import gc
-
 from utils.preprocess import preprocess_image
+from utils.xai import make_gradcam_heatmap, save_and_display_gradcam
 
 # ─────────────────────────────────────────────────────────────
 # Paths
@@ -125,6 +125,7 @@ def _demo_prediction():
         "confidence"  : confidence,
         "is_healthy"  : _is_healthy(chosen),
         "is_demo"     : True,
+        "heatmap_url"     : None,
     }
 
 
@@ -160,6 +161,36 @@ def predict_disease(image_path: str) -> dict:
 
         class_name = _class_list[pred_index]
 
+        # ── Generate Grad-CAM Heatmap ─────────────────────────────────────
+        heatmap_url = None
+        try:
+            # Note: We need the name of the last conv layer. For most Keras applications
+            # this works. If using MobileNetV2 it's often 'out_relu' or 'Conv_1'.
+            # If using custom models it could be 'conv2d_4'. 
+            # We'll try to find the last Conv2D node automatically.
+            last_conv_name = None
+            for layer in reversed(model.layers):
+                if 'conv' in layer.name.lower():
+                    last_conv_name = layer.name
+                    break
+            
+            if last_conv_name:
+                heatmap = make_gradcam_heatmap(img_tensor, model, last_conv_name, pred_index)
+                
+                # Save the heatmap next to the uploaded image
+                img_dir, img_filename = os.path.split(image_path)
+                heatmap_filename = f"cam_{img_filename}"
+                heatmap_path = os.path.join(img_dir, heatmap_filename)
+                
+                save_and_display_gradcam(image_path, heatmap, heatmap_path)
+                heatmap_url = f"/static/uploads/{heatmap_filename}"
+            else:
+                print("[WARN] Could not find a convolutional layer for XAI heatmap.")
+                
+        except Exception as xai_e:
+            print(f"[WARN] XAI Heatmap generation failed: {xai_e}")
+            # Non-fatal error, prediction still valid
+            
         # Manual cleanup to help Render's OOM issues
         gc.collect()
 
@@ -169,6 +200,7 @@ def predict_disease(image_path: str) -> dict:
             "confidence"  : round(confidence, 2),
             "is_healthy"  : _is_healthy(class_name),
             "is_demo"     : False,
+            "heatmap_url" : heatmap_url,
         }
 
     except Exception as exc:

@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+project/static/uploads/*
+!project/static/uploads/.gitkeep
+project/radar.db
+project/test.mp3
+project/utils/__pycache__/
+project/model/__pycache__/

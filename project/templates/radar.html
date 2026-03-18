@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CropAI — Disease Outbreak Radar</title>
+    <meta name="description" content="Live heatmap of crop disease outbreaks." />
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <!-- Custom Styles -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" />
+    <style>
+        #radarMap {
+            height: 70vh;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            z-index: 1; /* Keep map below navbar */
+        }
+        
+        /* Dark Theme overrides for Leaflet popups */
+        .leaflet-popup-content-wrapper {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+        }
+        .leaflet-popup-tip {
+            background: var(--bg-glass);
+            border: 1px solid var(--border);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── Navigation ──────────────────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <span class="brand-icon">🌿</span> CropAI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <i class="bi bi-list fs-3" style="color:var(--text-main)"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto gap-1">
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}"><i class="bi bi-house me-1"></i>Home</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="{{ url_for('radar') }}"><i class="bi bi-geo-alt me-1"></i>Outbreak Radar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('history') }}"><i class="bi bi-clock-history me-1"></i>History</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}"><i class="bi bi-info-circle me-1"></i>About</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── Header ──────────────────────────────────────────────────────────── -->
+    <header class="py-5 text-center">
+        <div class="container fade-in-up">
+            <span class="badge"
+                style="background:rgba(255,255,255,.05); color:var(--text-muted); border:1px solid var(--border); font-weight:500; padding:6px 12px; margin-bottom:1rem;">
+                <i class="bi bi-broadcast text-danger me-1"></i>Live Telemetry
+            </span>
+            <h1 class="hero-title">Real-Time Disease Outbreak <span style="color:var(--primary-light)">Radar</span></h1>
+            <p class="hero-subtitle mb-0">
+                Tracking geo-tagged disease detections locally to prevent regional epidemics.
+            </p>
+        </div>
+    </header>
+
+    <!-- ── Map Section ──────────────────────────────────────────────────────── -->
+    <section class="pb-5">
+        <div class="container fade-in-up delay-1">
+            <div class="position-relative">
+                <div id="radarMap"></div>
+                <div id="mapLoader" class="position-absolute top-50 start-50 translate-middle d-flex flex-column align-items-center" style="z-index: 1000; background: rgba(0,0,0,0.6); padding: 20px; border-radius: 12px; backdrop-filter: blur(4px);">
+                    <div class="spinner-border text-success" role="status">
+                        <span class="visually-hidden">Loading map data...</span>
+                    </div>
+                    <span class="mt-2 text-white">Fetching outbreak data...</span>
+                </div>
+            </div>
+            
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <div class="glass-card p-3 d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-danger p-2 me-3" style="width:16px; height:16px;"></div>
+                        <div><strong class="d-block">High Severity</strong><small class="text-muted">Immediate threat spotted</small></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-3 d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-warning p-2 me-3" style="width:16px; height:16px;"></div>
+                        <div><strong class="d-block">Medium Severity</strong><small class="text-muted">Action required soon</small></div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="glass-card p-3 d-flex align-items-center mb-3">
+                        <div class="rounded-circle bg-success p-2 me-3" style="width:16px; height:16px;"></div>
+                        <div><strong class="d-block">Healthy</strong><small class="text-muted">Clear zones</small></div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- ── Footer ───────────────────────────────────────────────────────────── -->
+    <footer>
+        <div class="container text-center">
+            <p class="mb-0">
+                🌿 <strong>CropAI</strong> — Built with Flask &amp; Leaflet.js
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Default center (India)
+            const defaultLat = 20.5937;
+            const defaultLng = 78.9629;
+            const zoomLevel = 5;
+
+            // Initialize map
+            const map = L.map('radarMap').setView([defaultLat, defaultLng], zoomLevel);
+
+            // Add Dark Matter CartoDB tiles
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            }).addTo(map);
+
+            // Fetch data
+            fetch('/api/radar_data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('mapLoader').classList.add('d-none');
+                    
+                    if(data.length === 0) {
+                        console.log("No radar data available yet.");
+                        return;
+                    }
+
+                    // Create markers
+                    const markers = [];
+                    data.forEach(point => {
+                        let color = 'gray';
+                        if (point.severity === 'high') color = '#dc3545'; // danger
+                        else if (point.severity === 'medium') color = '#ffc107'; // warning
+                        else if (point.severity === 'low') color = '#198754'; // success
+
+                        // Determine if it's healthy based on name
+                        if(point.disease_name.toLowerCase().includes('healthy')) color = '#198754';
+
+                        const circleMarker = L.circleMarker([point.lat, point.lng], {
+                            radius: 8,
+                            fillColor: color,
+                            color: '#fff',
+                            weight: 1,
+                            opacity: 1,
+                            fillOpacity: 0.8
+                        }).addTo(map);
+
+                        circleMarker.bindPopup(`
+                            <div style="font-family: 'Inter', sans-serif;">
+                                <strong style="color: ${color}; font-size: 1.1rem; display: block; margin-bottom: 4px;">${point.disease_name}</strong>
+                                <span class="d-block"><i class="bi bi-exclamation-triangle me-1"></i> Severity: ${point.severity.toUpperCase()}</span>
+                                <small class="text-muted d-block mt-2"><i class="bi bi-clock me-1"></i> ${new Date(point.timestamp).toLocaleString()}</small>
+                            </div>
+                        `);
+                        
+                        markers.push(circleMarker);
+                    });
+
+                    // If we have markers, try to center the map on the user's location if possible
+                    if(navigator.geolocation) {
+                        navigator.geolocation.getCurrentPosition(position => {
+                            map.flyTo([position.coords.latitude, position.coords.longitude], 7, {
+                                animate: true,
+                                duration: 1.5
+                            });
+                        });
+                    }
+
+                })
+                .catch(err => {
+                    console.error("Failed to fetch radar data:", err);
+                    document.getElementById('mapLoader').innerHTML = '<span class="text-danger">Failed to load data.</span>';
+                });
+        });
+    </script>
+</body>
+
+</html>

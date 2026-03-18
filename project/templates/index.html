@@ -28,6 +28,7 @@
     <div class="collapse navbar-collapse" id="mainNav">
       <ul class="navbar-nav ms-auto gap-1">
         <li class="nav-item"><a class="nav-link active" href="{{ url_for('index') }}"><i class="bi bi-house me-1"></i>Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('radar') }}"><i class="bi bi-geo-alt me-1"></i>Outbreak Radar</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('history') }}"><i class="bi bi-clock-history me-1"></i>History</a></li>
         <li class="nav-item"><a class="nav-link" href="{{ url_for('about') }}"><i class="bi bi-info-circle me-1"></i>About</a></li>
       </ul>
@@ -102,6 +103,8 @@
 
           <form id="upload-form" action="{{ url_for('predict') }}" method="POST" enctype="multipart/form-data">
             <input type="file" id="file-input" name="file" accept="image/*" class="d-none" />
+            <input type="hidden" id="lat-input" name="lat" value="" />
+            <input type="hidden" id="lng-input" name="lng" value="" />
 
             <!-- Upload Zone -->
             <div class="upload-zone mb-4" id="upload-zone">
@@ -243,5 +246,38 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Custom JS -->
 <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+<script>
+  // Intercept form submission to grab geolocation
+  document.getElementById('upload-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const btn = document.getElementById('analyze-btn');
+    
+    // Disable button to prevent double submit
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Locating...';
+    
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          // Success
+          document.getElementById('lat-input').value = position.coords.latitude;
+          document.getElementById('lng-input').value = position.coords.longitude;
+          form.submit();
+        },
+        function(error) {
+          // Failure (user denied or error)
+          console.warn('Geolocation failed:', error);
+          form.submit(); // Submit anyway without coords
+        },
+        { timeout: 5000 } // Don't wait forever
+      );
+    } else {
+      // Browser doesn't support it
+      form.submit();
+    }
+  });
+</script>
 </body>
 </html>

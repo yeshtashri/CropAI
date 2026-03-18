@@ -46,6 +46,9 @@ RECOMMENDATIONS = {
             "Badge X2 (Copper Oxychloride + Copper Hydroxide)",
             "Actigard 50WG (Acibenzolar-S-methyl) — systemic resistance activator",
         ],
+        "estimated_yield_loss_pct": "30-50%",
+        "estimated_loss_inr": "₹12,000 - ₹20,000 per acre",
+        "treatment_cost_inr": "₹1,500 - ₹2,500 per acre",
     },
 
     "Pepper__bell___healthy": {
@@ -98,6 +101,9 @@ RECOMMENDATIONS = {
             "Quadris (Azoxystrobin)",
             "Revus Top (Mandipropamid + difenoconazole)",
         ],
+        "estimated_yield_loss_pct": "20-40%",
+        "estimated_loss_inr": "₹10,000 - ₹18,000 per acre",
+        "treatment_cost_inr": "₹1,200 - ₹1,800 per acre",
     },
 
     "Potato___Late_blight": {
@@ -131,6 +137,9 @@ RECOMMENDATIONS = {
             "Curzate (Cymoxanil + Mancozeb)",
             "Infinito (Propamocarb + Fluopicolide)",
         ],
+        "estimated_yield_loss_pct": "70-100%",
+        "estimated_loss_inr": "₹35,000 - ₹50,000 per acre",
+        "treatment_cost_inr": "₹2,500 - ₹4,000 per acre",
     },
 
     "Potato___healthy": {
@@ -179,6 +188,9 @@ RECOMMENDATIONS = {
             "Cuprofix Ultra 40D (Copper Sulfate)",
             "Badge SC (Copper Oxychloride)",
         ],
+        "estimated_yield_loss_pct": "25-50%",
+        "estimated_loss_inr": "₹15,000 - ₹30,000 per acre",
+        "treatment_cost_inr": "₹1,800 - ₹3,000 per acre",
     },
 
     "Tomato_Early_blight": {
@@ -208,6 +220,9 @@ RECOMMENDATIONS = {
             "Quadris (Azoxystrobin)",
             "Cabrio EG (Pyraclostrobin)",
         ],
+        "estimated_yield_loss_pct": "15-35%",
+        "estimated_loss_inr": "₹8,000 - ₹15,000 per acre",
+        "treatment_cost_inr": "₹1,200 - ₹2,000 per acre",
     },
 
     "Tomato_Late_blight": {
@@ -238,6 +253,9 @@ RECOMMENDATIONS = {
             "Revus (Mandipropamid)",
             "Forum (Dimethomorph)",
         ],
+        "estimated_yield_loss_pct": "80-100%",
+        "estimated_loss_inr": "₹40,000 - ₹60,000 per acre",
+        "treatment_cost_inr": "₹3,000 - ₹5,000 per acre",
     },
 
     "Tomato_Leaf_Mold": {
@@ -267,6 +285,9 @@ RECOMMENDATIONS = {
             "Teldor (Fenhexamid)",
             "Copper-based fungicides",
         ],
+        "estimated_yield_loss_pct": "10-25%",
+        "estimated_loss_inr": "₹5,000 - ₹12,000 per acre",
+        "treatment_cost_inr": "₹1,000 - ₹1,500 per acre",
     },
 
     "Tomato_Septoria_leaf_spot": {
@@ -298,6 +319,9 @@ RECOMMENDATIONS = {
             "Copper Octanoate",
             "Amistar (Azoxystrobin)",
         ],
+        "estimated_yield_loss_pct": "20-40%",
+        "estimated_loss_inr": "₹10,000 - ₹20,000 per acre",
+        "treatment_cost_inr": "₹1,200 - ₹2,200 per acre",
     },
 
     "Tomato_Spider_mites_Two_spotted_spider_mite": {
@@ -330,6 +354,9 @@ RECOMMENDATIONS = {
             "Oberon (Spiromesifen)",
             "Neem Oil (organic option)",
         ],
+        "estimated_yield_loss_pct": "15-30%",
+        "estimated_loss_inr": "₹8,000 - ₹15,000 per acre",
+        "treatment_cost_inr": "₹1,500 - ₹2,800 per acre",
     },
 
     "Tomato__Target_Spot": {
@@ -359,6 +386,9 @@ RECOMMENDATIONS = {
             "Mancozeb 80 WP",
             "Merivon (Fluxapyroxad + Pyraclostrobin)",
         ],
+        "estimated_yield_loss_pct": "15-25%",
+        "estimated_loss_inr": "₹7,000 - ₹13,000 per acre",
+        "treatment_cost_inr": "₹1,100 - ₹2,000 per acre",
     },
 
     "Tomato__Tomato_YellowLeaf__Curl_Virus": {
@@ -392,6 +422,9 @@ RECOMMENDATIONS = {
             "Neem Oil — organic whitefly repellent",
             "Movento (Spirotetramat) — phloem-active insecticide",
         ],
+        "estimated_yield_loss_pct": "50-90%",
+        "estimated_loss_inr": "₹25,000 - ₹45,000 per acre",
+        "treatment_cost_inr": "₹2,000 - ₹4,000 per acre",
     },
 
     "Tomato__Tomato_mosaic_virus": {
@@ -422,6 +455,9 @@ RECOMMENDATIONS = {
             "No direct pesticide treatment for virus.",
             "Control insect vectors with Imidacloprid or Pyrethrins.",
         ],
+        "estimated_yield_loss_pct": "30-60%",
+        "estimated_loss_inr": "₹15,000 - ₹30,000 per acre",
+        "treatment_cost_inr": "₹1,000 - ₹2,500 per acre (vector control)",
     },
 
     "Tomato_healthy": {
@@ -480,4 +516,7 @@ def get_recommendation(disease_name: str) -> dict:
         ],
         "severity": "medium",
         "pesticides": [],
+        "estimated_yield_loss_pct": "Unknown",
+        "estimated_loss_inr": "Unknown",
+        "treatment_cost_inr": "Unknown",
     }
